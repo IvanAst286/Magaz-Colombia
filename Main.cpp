@@ -8,10 +8,14 @@
 // ----------------------------- Учётные записи -----------------------------------
 
 size_t userSize = 2;
+size_t staffCount = 1;
 std::string userStatus[3]{ "Супер администратор","Администратор","Сотрудник" };
 std::string* loginArr = new std::string[userSize]{ "admin","user" };
 std::string* passArr = new std::string[userSize]{ "admin","user" };
 std::string* statusArr = new std::string[userSize]{ userStatus[0], userStatus[2] };
+double* salesArr = new double[userSize] {0.0, 0.0};
+unsigned int* userIdArr = new unsigned int[userSize] {1, 2};
+unsigned int currentId = 0;
 std::string currentStatus;
 
 
@@ -78,7 +82,7 @@ int main()
 	srand(time(NULL));
 	Start();
 
-	delete[]loginArr, passArr, statusArr;
+	delete[]loginArr, passArr, statusArr, salesArr, userIdArr;
 	if (isStorageCreated)
 	{
 		delete[]idArr, nameArr, countArr, priceArr;
@@ -174,6 +178,7 @@ bool Login()
 				std::cout << "Пользователь: " << loginArr[i] << "\nДобро пожаловать!\n\n";
 				std::cout << "Ваш статус: " << statusArr[i] << "\n\n";
 				currentStatus = statusArr[i];
+				currentId = userIdArr[i];
 				return true;
 			}
 
@@ -526,23 +531,35 @@ void AddNewUsers()
 			if (choose == "1")
 			{
 				userSize++;
+				if (newRole == userStatus[2])
+				{
+					staffCount++;
+				}
 				std::string* loginArrTemp = new std::string[userSize];
 				std::string* passArrTemp = new std::string[userSize];
 				std::string* statusArrTemp = new std::string[userSize];
+				double* salesArrTemp = new double[userSize];
+				unsigned int* userIdArrTemp = new unsigned int[userSize];
 
 				FillArr(loginArrTemp, loginArr, userSize - 1);
 				FillArr(passArrTemp, passArr, userSize - 1);
 				FillArr(statusArrTemp, statusArr, userSize - 1);
+				FillArr(salesArrTemp, salesArr, userSize - 1);
+				FillArr(userIdArrTemp, userIdArr, userSize - 1);
 
 				loginArrTemp[userSize - 1] = newLogin;
 				passArrTemp[userSize - 1] = newPass;
 				statusArrTemp[userSize - 1] = newRole;
+				salesArrTemp[userSize - 1] = 0.0;
+				userIdArrTemp[userSize - 1] = userSize;
 
 				std::swap(loginArrTemp, loginArr);
 				std::swap(passArrTemp, passArr);
 				std::swap(statusArrTemp, statusArr);
+				std::swap(salesArrTemp, salesArr);
+				std::swap(userIdArrTemp, userIdArr);
 
-				delete[] loginArrTemp, passArrTemp, statusArrTemp;
+				delete[] loginArrTemp, passArrTemp, statusArrTemp, salesArrTemp, userIdArrTemp;
 				std::cout << "Идёт подготовка... ";
 				Sleep(2000);
 				std::cout << "Пользователь успешно добавлен!\n\n";
@@ -651,14 +668,18 @@ void DeleteUser()
 				Sleep(1500);
 				return;
 			}
-			ShowUsers();
-			isAdmin = 1;
 		}
-		else
+		else if (currentStatus == userStatus[1])
 		{
-			/*ShowUsers();
-			isAdmin = 1;*/
+			if (staffCount < 1)
+			{
+				std::cout << "Нет доступных пользователей для удаления\n";
+				Sleep(1500);
+				return;
+			}
 		}
+		ShowUsers();
+		isAdmin = 1;
 
 		std::cout << "Выберите номер пользователя для удаления или \"exit\" для выхода: ";
 		Getline(choose);
@@ -682,6 +703,14 @@ void DeleteUser()
 				if (i == userNumber)
 				{
 					system("cls");
+
+					if (currentStatus == userStatus[1] && statusArr[userNumber] != userStatus[2])
+					{
+						std::cout << "Нельзя удалять администратора\n";
+						Sleep(1500);
+						break;
+					}
+
 					std::cout << "Удаление пользователя: " << loginArr[i] << "\n\n";
 					std::cout << "Для подтверждения введите пароль супер администратора или \"exit\" для выхода: ";
 					Getline(checkPass);
@@ -694,9 +723,15 @@ void DeleteUser()
 					else if (checkPass == passArr[0])
 					{
 						userSize--;
+						if (statusArr[userNumber] == userStatus[2])
+						{
+							staffCount--;
+						}
 						std::string* loginArrTemp = new std::string[userSize];
 						std::string* passArrTemp = new std::string[userSize];
 						std::string* statusArrTemp = new std::string[userSize];
+						double* salesArrTemp = new double[userSize];
+						unsigned int* userIdArrTemp = new unsigned int[userSize];
 
 						for (size_t i = 0, c = 0; i < userSize; i++, c++)
 						{
@@ -707,13 +742,17 @@ void DeleteUser()
 							loginArrTemp[i] = loginArr[c];
 							passArrTemp[i] = passArr[c];
 							statusArrTemp[i] = statusArr[c];
+							salesArrTemp[i] = salesArr[c];
+							userIdArrTemp[i] = userIdArr[c];
 						}
 
 						std::swap(loginArrTemp, loginArr);
 						std::swap(passArrTemp, passArr);
 						std::swap(statusArrTemp, statusArr);
+						std::swap(salesArrTemp, salesArr);
+						std::swap(userIdArrTemp, userIdArr);
 
-						delete[] loginArrTemp, passArrTemp, statusArrTemp;
+						delete[] loginArrTemp, passArrTemp, statusArrTemp, salesArrTemp, userIdArrTemp;
 						std::cout << "Идёт подготовка... ";
 						Sleep(2000);
 						std::cout << "Пользователь успешно удалён!\n\n";
