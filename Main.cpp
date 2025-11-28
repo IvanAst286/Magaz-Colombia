@@ -50,7 +50,7 @@ void FillArr(ArrType* dynamicArr, ArrType* staticArr, size_t arraySize);
 // --------------------------------------------------------------------------------
 
 
-// -------------------------------- Служебные -------------------------------------
+// ------------------------------- Служебные -------------------------------------
 
 std::unordered_set<char> specialSymbols;
 std::unordered_set<char> passSymbols;
