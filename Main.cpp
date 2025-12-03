@@ -528,7 +528,7 @@ void ShowSuperAdminMenu()
 		Getline(choose);
 		if (choose == "1" && storageSize > 0)
 		{
-			void Selling();
+			Selling();
 		}
 		else if (choose == "2" && storageSize > 0)
 		{
