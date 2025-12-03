@@ -439,13 +439,14 @@ void Start()
 				ShowAdminMenu();
 			}
 		}
-		else
+		else if (currentStatus == userStatus[0] && currentStatus == userStatus[1])
 		{
 			system("cls");
 			std::cout << "Итоговая прибыль за смену: " << cashIncome + bankIncome;
 			std::cout << "\n\n\tЗавершение работы\n";
 			Sleep(2000);
 			system("cls");
+			break;
 		}
 	}
 }
@@ -664,7 +665,8 @@ void ShowUserMenu()
 			Err();
 		}
 	}
-}
+	system("cls");
+}	
 
 void ShowIncome()
 {
