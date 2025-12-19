@@ -69,6 +69,8 @@ void Selling();
 void CheckArrPushback();
 void PrintCheck(double& totalSum);
 void StorageReturner();
+double PromoDiscount(const std::string& promoCode, const double sumTotal);
+double VolumeDiscount(const double sumTotal);
 
 // --------------------------------- Служебные -----------------------------------
 
@@ -119,11 +121,47 @@ int main()
 	return 0;
 }
 
+double PromoDiscount(const std::string& promoCode, const double sumTotal) 
+{
+	double discount = 0.0;
+
+	if (promoCode == "NEWYEAR") 
+	{
+		discount = sumTotal * 0.1; 
+	}
+	else if (promoCode == "BIRTHDAY") 
+	{
+		discount = sumTotal * 0.15; 
+	}
+	else if (promoCode == "SUMMER") 
+	{
+		discount = sumTotal * 0.05; 
+	}
+
+	return discount; 
+}
+
+double VolumeDiscount(const double sumTotal) 
+{
+	double discount = 0.0;
+
+	if (sumTotal >= 5000) 
+	{
+		discount = sumTotal * 0.1; 
+	}
+	else if (sumTotal >= 3000) 
+	{
+		discount = sumTotal * 0.05; 
+	}
+
+	return discount; 
+}
+
 void Selling()
 {
-	std::string chooseId, chooseCount, chooseMoney, choose;
+	std::string chooseId, chooseCount, chooseMoney, choose, promoCode;
 	unsigned int id = 0, count = 0, index = -1;
-	double money = 0.0, totalSum = 0.0;
+	double money = 0.0, totalSum = 0.0, discountAmount = 0.0;
 	bool isFirst = false;
 	checkSize = 0;
 
@@ -145,9 +183,19 @@ void Selling()
 			}
 
 			PrintCheck(totalSum);
-			std::cout << "\nПодтвердите покупку?\n1- Да\n2 - Добавить ещё товар\n3 - Отмена\nВвод: ";
+			std::cout << "\nХотите применить промокод? (Y/N): ";
 			Getline(choose);
-			if (choose == "1")
+			if (choose == "Y" || choose == "y") 
+			{
+				std::cout << "Введите промокод: ";
+				Getline(promoCode);
+				discountAmount += PromoDiscount(promoCode, totalSum); 
+			}
+			else if (choose == "N" || choose == "n")
+			{
+				std::cout << "\nПодтвердите покупку?\n1- Да\n2 - Добавить ещё товар\n3 - Отмена\nВвод: ";
+				Getline(choose);
+				if (choose == "1")
 			{
 				while (true)
 				{
@@ -229,11 +277,11 @@ void Selling()
 					}
 				}
 			}
-			else if (choose == "2")
+				else if (choose == "2")
 			{
 				continue;
 			}
-			else if (choose == "3")
+				else if (choose == "3")
 			{
 				std::cout << "Отмена покупки!\n";
 				StorageReturner();
@@ -241,12 +289,17 @@ void Selling()
 				system("cls");
 				return;
 			}
-			else 
+				else 
 			{
 				Err();
 				continue;
 			}
+			}
+			discountAmount += VolumeDiscount(totalSum);
+			std::cout << "\nПримененные скидки: " << discountAmount << " руб." << std::endl;
+			totalSum -= discountAmount; 
 
+			
 			delete[] idArrCheck; 
 			delete[] nameArrCheck;
 			delete[] countArrCheck;
