@@ -69,7 +69,7 @@ void Selling();
 void CheckArrPushback();
 void PrintCheck(double& totalSum);
 void StorageReturner();
-double PromoDiscount(const std::string& promoCode, double& totalSum);
+double PromoDiscount(const std::string& promoCode, double& totalSum, double& totalSumDiscount);
 
 // --------------------------------- Служебные -----------------------------------
 
@@ -123,21 +123,24 @@ int main()
 double PromoDiscount(const std::string& promoCode, double& totalSum)
 {
 	double discount = 0.0;
-
+	
 	if (promoCode == "NEWYEAR") 
 	{
-		discount = totalSum * 0.1;
+		discount = totalSum * 0.03;
+		totalSum = totalSum - discount;
 	}
 	else if (promoCode == "BIRTHDAY") 
 	{
-		discount = totalSum * 0.15;
+		discount = totalSum * 0.08;
+		totalSum = totalSum - discount;
 	}
 	else if (promoCode == "SUMMER") 
 	{
 		discount = totalSum * 0.05;
+		totalSum = totalSum - discount;
 	}
 
-	return discount; 
+	return totalSum;
 }
 
 void Selling()
@@ -172,7 +175,7 @@ void Selling()
 			{
 				std::cout << "Введите промокод: ";
 				Getline(promoCode);
-				discountAmount += PromoDiscount(promoCode, totalSum); 
+				discountAmount += PromoDiscount(promoCode, totalSum);
 				std::cout << "\nПримененные скидки: " << discountAmount << " руб." << "\n";
 				totalSum -= discountAmount;
 			}
@@ -503,12 +506,14 @@ void PrintCheck(double& totalSum)
 	if (totalSum >= 3000)
 	{
 		discount = totalSum * 0.05;
-		std::cout << "\nИтого к оплате (с учётом скидки 5%): " << discount << "\n\n";
+		totalSum = totalSum - discount;
+		std::cout << "\nИтого к оплате (с учётом скидки 5%): " << totalSum << "\n\n";
 	}
 	else if (totalSum >= 5000)
 	{
 		discount = totalSum * 0.1;
-		std::cout << "\nИтого к оплате (с учётом скидки 15%): " << discount << "\n\n";
+		totalSum = totalSum - discount;
+		std::cout << "\nИтого к оплате (с учётом скидки 15%): " << totalSum << "\n\n";
 	}
 	else
 	{
