@@ -69,8 +69,7 @@ void Selling();
 void CheckArrPushback();
 void PrintCheck(double& totalSum);
 void StorageReturner();
-double PromoDiscount(const std::string& promoCode, const double sumTotal);
-double VolumeDiscount(const double sumTotal);
+double PromoDiscount(const std::string& promoCode, double& totalSum);
 
 // --------------------------------- Служебные -----------------------------------
 
@@ -121,37 +120,21 @@ int main()
 	return 0;
 }
 
-double PromoDiscount(const std::string& promoCode, const double sumTotal) 
+double PromoDiscount(const std::string& promoCode, double& totalSum)
 {
 	double discount = 0.0;
 
 	if (promoCode == "NEWYEAR") 
 	{
-		discount = sumTotal * 0.1; 
+		discount = totalSum * 0.1;
 	}
 	else if (promoCode == "BIRTHDAY") 
 	{
-		discount = sumTotal * 0.15; 
+		discount = totalSum * 0.15;
 	}
 	else if (promoCode == "SUMMER") 
 	{
-		discount = sumTotal * 0.05; 
-	}
-
-	return discount; 
-}
-
-double VolumeDiscount(const double sumTotal) 
-{
-	double discount = 0.0;
-
-	if (sumTotal >= 5000) 
-	{
-		discount = sumTotal * 0.1; 
-	}
-	else if (sumTotal >= 3000) 
-	{
-		discount = sumTotal * 0.05; 
+		discount = totalSum * 0.05;
 	}
 
 	return discount; 
@@ -190,6 +173,8 @@ void Selling()
 				std::cout << "Введите промокод: ";
 				Getline(promoCode);
 				discountAmount += PromoDiscount(promoCode, totalSum); 
+				std::cout << "\nПримененные скидки: " << discountAmount << " руб." << "\n";
+				totalSum -= discountAmount;
 			}
 			else if (choose == "N" || choose == "n")
 			{
@@ -295,10 +280,111 @@ void Selling()
 				continue;
 			}
 			}
-			discountAmount += VolumeDiscount(totalSum);
-			std::cout << "\nПримененные скидки: " << discountAmount << " руб." << std::endl;
-			totalSum -= discountAmount; 
-
+			else
+			{
+				Err();
+			}
+			std::cout << "\nПодтвердите покупку?\n1- Да\n2 - Добавить ещё товар\n3 - Отмена\nВвод: ";
+			Getline(choose);
+			if (choose == "1")
+			{
+				while (true)
+				{
+					system("cls");
+					std::cout << "Выберите способ оплаты\n1 - Наличными\n2 - Безнал\nВвод: ";
+					Getline(choose);
+					if (choose == "1")
+					{
+						std::cout << "Введите кол-во наличных: ";
+						Getline(chooseMoney);
+						if (IsNumber(chooseMoney))
+						{
+							money = std::stod(chooseMoney);
+							if (money < totalSum)
+							{
+								std::cout << "Недостатосно средств!\n";
+								Sleep(1500);
+								continue;
+							}
+							else if (money - totalSum > cash)
+							{
+								std::cout << "Нет возможности дать сдачи. Повторите попытку!\n";
+								Sleep(1500);
+								continue;
+							}
+							else
+							{
+								std::cout << "Ваши: " << money << "\n";
+								Sleep(400);
+								std::cout << "Оплата прошла успешно. Сдача: " << money - totalSum << " рублей\n";
+								Sleep(2000);
+								cash += totalSum;
+								cash -= money - totalSum;
+								cashIncome += totalSum;
+								salesArr[currentId] += totalSum;
+								system("cls");
+								break;
+							}
+						}
+					}
+					else if (choose == "2")
+					{
+						std::cout << "Приложить карту\n\n";
+						Sleep(1000);
+						if (rand() % 10 <= 2)
+						{
+							for (size_t i = 0; i < 5; i++)
+							{
+								std::cout << i + 1 << "\t";
+								Sleep(500);
+							}
+							std::cout << "\nСоединение не установлено. Повторите попытку\n";
+							Sleep(1500);
+						}
+						else
+						{
+							for (size_t i = 0; i < 5; i++)
+							{
+								std::cout << i + 1 << "\t";
+								Sleep(500);
+							}
+							std::cout << "\nОплата прошла успешно\n\nСпасибо за покупку!";
+							bankIncome += totalSum;
+							salesArr[currentId] += totalSum;
+							Sleep(1500);
+							break;
+						}
+					}
+					else if (choose == "Iman")
+					{
+						std::cout << "Иман оплатил вам чек. Всего доброго";
+						Sleep(1500);
+						system("cls");
+						break;
+					}
+					else
+					{
+						Err();
+					}
+				}
+			}
+			else if (choose == "2")
+			{
+				continue;
+			}
+			else if (choose == "3")
+			{
+				std::cout << "Отмена покупки!\n";
+				StorageReturner();
+				Sleep(1500);
+				system("cls");
+				return;
+			}
+			else
+			{
+				Err();
+				continue;
+			}
 			
 			delete[] idArrCheck; 
 			delete[] nameArrCheck;
@@ -403,6 +489,8 @@ void CheckArrPushback()
 
 void PrintCheck(double& totalSum)
 {
+	double discount = 0.0;
+
 	std::cout << "№\t" << "ID\t" << std::left << std::setw(25) << "Название товара\t\t"
 		<< "Цена за ед\t" << "Кол-во\n" << "Итого\n";
 
@@ -412,7 +500,20 @@ void PrintCheck(double& totalSum)
 			<< nameArrCheck[i] << "\t" << priceArrCheck[i] << "\t\t" << countArrCheck[i] 
 			<< "\t" << totalPriceArrCheck[i] << "\n";
 	}
-	std::cout << "\nИтого к оплате: " << totalSum << "\n\n";
+	if (totalSum >= 3000)
+	{
+		discount = totalSum * 0.05;
+		std::cout << "\nИтого к оплате (с учётом скидки 5%): " << discount << "\n\n";
+	}
+	else if (totalSum >= 5000)
+	{
+		discount = totalSum * 0.1;
+		std::cout << "\nИтого к оплате (с учётом скидки 15%): " << discount << "\n\n";
+	}
+	else
+	{
+		std::cout << "\nИтого к оплате: " << totalSum << "\n\n";
+	}
 }
 
 void StorageReturner()
