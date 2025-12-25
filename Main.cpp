@@ -69,7 +69,7 @@ void Selling();
 void CheckArrPushback();
 void PrintCheck(double& totalSum);
 void StorageReturner();
-double PromoDiscount(const std::string& promoCode, double& totalSum, double& totalSumDiscount);
+double PromoDiscount(const std::string& promoCode, double& totalSum);
 
 // --------------------------------- Служебные -----------------------------------
 
